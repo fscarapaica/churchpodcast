@@ -1,0 +1,22 @@
+package com.mano.hillsongpodcast.db.dao
+
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.mano.hillsongpodcast.model.MediaItem
+
+@Dao
+interface MediaItemDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(mediaItemList : List<MediaItem>)
+
+    @Query("SELECT * from media_item_table")
+    fun getAllMediaItem() : LiveData<List<MediaItem>>
+
+    @Query("DELETE FROM media_item_table")
+    suspend fun deleteAll()
+
+}

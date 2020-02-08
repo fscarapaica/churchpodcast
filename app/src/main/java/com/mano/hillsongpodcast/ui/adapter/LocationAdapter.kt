@@ -69,7 +69,7 @@ class LocationAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Location) = with(itemView) {
             itemView.setOnClickListener {
-                interaction?.onItemSelected(adapterPosition, item)
+                interaction?.onLocationItemSelected(adapterPosition, item)
             }
 
             itemView.site_name.text = item.name
@@ -88,6 +88,6 @@ class LocationAdapter(private val interaction: Interaction? = null) :
     }
 
     interface Interaction {
-        fun onItemSelected(position: Int, item: Location)
+        fun onLocationItemSelected(position: Int, item: Location)
     }
 }

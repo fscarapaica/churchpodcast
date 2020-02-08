@@ -67,7 +67,7 @@ class MediaItemAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: MediaItem) = with(itemView) {
             itemView.setOnClickListener {
-                interaction?.onItemSelected(adapterPosition, item)
+                interaction?.onMediaItemSelected(adapterPosition, item)
             }
 
             itemView.media_item_title.text = item.title
@@ -86,6 +86,6 @@ class MediaItemAdapter(private val interaction: Interaction? = null) :
     }
 
     interface Interaction {
-        fun onItemSelected(position: Int, item: MediaItem)
+        fun onMediaItemSelected(position: Int, item: MediaItem)
     }
 }
