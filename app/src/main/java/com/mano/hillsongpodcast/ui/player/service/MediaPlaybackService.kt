@@ -1,28 +1,24 @@
 package com.mano.hillsongpodcast.ui.player.service
 
-import android.app.PendingIntent
-import android.content.Context
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.audio.AudioAttributes
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-
 
 private const val LOG_TAG = "MediaPlaybackService"
-private const val MY_EMPTY_MEDIA_ROOT_ID = "media_root_id"
+private const val MY_MEDIA_ROOT_ID = "media_root_id"
+private const val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
 
+@SuppressLint("Registered")
 class MediaPlaybackService : MediaBrowserServiceCompat() {
-
-    private val serviceJob = SupervisorJob()
-    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var stateBuilder: PlaybackStateCompat.Builder
@@ -44,53 +40,38 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         }
     }
 
-
     override fun onCreate() {
         super.onCreate()
 
-        val sessionActivityPendingIntent =
-            packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-                PendingIntent.getActivity(this, 0, sessionIntent, 0)
-            }
-
-        // Create a new MediaSession.
-        mediaSession = MediaSessionCompat(this, "MusicService")
-            .apply {
-                setSessionActivity(sessionActivityPendingIntent)
-                isActive = true
-            }
-
-        sessionToken = mediaSession.sessionToken
-
-
-        /*mediaSession = MediaSessionCompat(baseContext, LOG_TAG).apply {
-
+        // Create a MediaSessionCompat
+        mediaSession = MediaSessionCompat(baseContext, LOG_TAG).apply {
             // Enable callbacks from MediaButtons and TransportControls
-            setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-                    or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+            setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                        or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
             )
 
             // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
             stateBuilder = PlaybackStateCompat.Builder()
-                .setActions(PlaybackStateCompat.ACTION_PLAY
-                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                .setActions(
+                    PlaybackStateCompat.ACTION_PLAY
+                            or PlaybackStateCompat.ACTION_PLAY_PAUSE
                 )
             setPlaybackState(stateBuilder.build())
-
-            // MySessionCallback() has methods that handle callbacks from a media controller
-            setCallback(MySessionCallback())
-
-            // Set the session's token so that client activities can communicate with it.
-            setSessionToken(sessionToken)
-        }*/
-
+            setCallback(sessionCallback)
+        }
+        // Set the session's token so that client activities can communicate with it.
+        sessionToken = mediaSession.sessionToken
     }
 
     override fun onLoadChildren(
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-        result.sendResult(null)
+        if (MY_EMPTY_MEDIA_ROOT_ID == parentId) {
+            result.sendResult(null)
+            return
+        }
     }
 
     override fun onGetRoot(
@@ -98,20 +79,30 @@ class MediaPlaybackService : MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        // Clients can connect, but this BrowserRoot is an empty hierachy
-        // so onLoadChildren returns nothing. This disables the ability to browse for content.
-        return BrowserRoot(MY_EMPTY_MEDIA_ROOT_ID, null)
+        return BrowserRoot(MY_MEDIA_ROOT_ID, null)
     }
 
-}
+    private val sessionCallback = object: MediaSessionCompat.Callback() {
+        override fun onStop() {
+            super.onStop()
+            // The onStop() callback should call stopSelf(). If the service was started, this stops it. In addition, the service is destroyed if there are no activities bound to it. Otherwise, the service remains bound until all its activities unbind. (If a subsequent startService() call is received before the service is destroyed, the pending stop is cancelled.)
+            stopSelf()
+            Log.d(MediaPlaybackService::class.java.simpleName, "Mano onStop")
+        }
 
-class MySessionCallback : MediaSessionCompat.Callback() {
+        override fun onPause() {
+            super.onPause()
+            Log.d(MediaPlaybackService::class.java.simpleName, "Mano onPause")
+        }
 
-    override fun onPause() {
-        super.onPause()
+        override fun onPlay() {
+            super.onPlay()
+            /*
+            * The media session onPlay() callback should include code that calls startService(). This ensures that the service starts and continues to run, even when all UI MediaBrowser activities that are bound to it unbind.
+            * */
+            // TODO: add the
+            Log.d(MediaPlaybackService::class.java.simpleName, "Mano onPlay")
+        }
     }
 
-    override fun onPlay() {
-        super.onPlay()
-    }
 }

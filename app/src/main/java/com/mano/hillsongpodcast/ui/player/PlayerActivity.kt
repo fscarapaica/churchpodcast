@@ -4,13 +4,17 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.MediaControllerCompat
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.Player
@@ -23,16 +27,21 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.mano.hillsongpodcast.R
 import com.mano.hillsongpodcast.model.MediaItem
+import com.mano.hillsongpodcast.ui.player.service.MediaPlaybackService
+import com.mano.hillsongpodcast.ui.player.service.MediaPlaybackService2
 import com.mano.hillsongpodcast.util.getJsonExtra
 import kotlinx.android.synthetic.main.activity_player.*
 
 
 class PlayerActivity : AppCompatActivity() {
 
+    private lateinit var mediaBrowser: MediaBrowserCompat
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
+        /*
         // TODO: Set an extra key for the media item
         val mediaitem = intent.getJsonExtra(MediaItem::class.java)
         Log.d("PlayerActivity", "lala $mediaitem ")
@@ -46,23 +55,6 @@ class PlayerActivity : AppCompatActivity() {
             showTimeoutMs = 0 // Always show the controllers
         }
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val followersChannel = NotificationChannel(
-                "hillsong_podcast",
-                "music_track",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(followersChannel)
-        }
-
-        val playerNotificationManager = PlayerNotificationManager(this,"hillsong_podcast", 1, DescriptorAdapter(application)).apply {
-            setPlayer(exoPlayer)
-            setUseNavigationActions(false)
-            setUseStopAction(true)
-        }
-
         // Produces DataSource instances through which media data is loaded.
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
             baseContext,
@@ -74,7 +66,31 @@ class PlayerActivity : AppCompatActivity() {
                 .createMediaSource(Uri.parse("https://d9nqqwcssctr8.cloudfront.net/wp-content/uploads/2019/12/05015719/PODCAST-CORAZON-POR-LA-CASA-2019.mp3"))
             exoPlayer.prepare(audioSource)
         }
+         */
+
+        mediaBrowser = MediaBrowserCompat(this,
+            ComponentName(this, MediaPlaybackService::class.java),
+            connectionCallBacks,
+            null
+        )
     }
+
+    override fun onStart() {
+        super.onStart()
+        mediaBrowser.connect()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        volumeControlStream = AudioManager.STREAM_MUSIC
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MediaControllerCompat.getMediaController(this)?.unregisterCallback(controllerCallback)
+        mediaBrowser.disconnect()
+    }
+
 
 }
 
