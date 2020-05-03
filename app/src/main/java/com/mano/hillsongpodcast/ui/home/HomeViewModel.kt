@@ -13,9 +13,9 @@ import kotlinx.coroutines.*
 class HomeViewModel(application: Application) : AndroidViewModel(application), LocationAdapter.Interaction, MediaItemAdapter.Interaction {
 
     private val _locationList = MutableLiveData<List<Location>>().apply {
-        value = listOf(Location(0, "Monterrey", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg"),
-            Location(1, "Buenos Aires", "https://images.clarin.com/2018/11/22/Az0o4AN5D_1256x620__1.jpg", "https://hillsong.com/es/buenosaires/all/podcasts/"),
-            Location(2, "Sao Pablo", "https://images.fridaymagazine.ae/1_2304285/imagesList_0/2456872028_main.jpg"))
+        value = listOf(Location(0, "Monterrey", "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg", "monterrey"),
+            Location(1, "Buenos Aires", "https://images.clarin.com/2018/11/22/Az0o4AN5D_1256x620__1.jpg", "buenosaires"),
+            Location(2, "Sao Pablo", "https://images.fridaymagazine.ae/1_2304285/imagesList_0/2456872028_main.jpg", "saopablo"))
     }
     val locationList: LiveData<List<Location>> = _locationList
 
@@ -35,18 +35,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application), L
 
     fun updateContent() {
         viewModelScope.launch {
-            locationList.value?.get(0)?.let {
+            locationList.value?.get(1)?.let {
                 mediaItemRepository.fetchMediaItems(it)
             }
         }
     }
 
     override fun onLocationItemSelected(position: Int, locationItem: Location) {
-
+        viewModelScope.launch {
+            mediaItemRepository.fetchMediaItems(locationItem)
+        }
     }
 
     override fun onMediaItemSelected(position: Int, mediaItem: MediaItem) {
-        _mediaItemSelected.value = mediaItem
+        viewModelScope.launch {
+            mediaItem.mediaLink = mediaItemRepository.fetchMediaTrack(mediaItem.link!!) ?: ""
+            _mediaItemSelected.value = mediaItem
+        }
     }
 
 }

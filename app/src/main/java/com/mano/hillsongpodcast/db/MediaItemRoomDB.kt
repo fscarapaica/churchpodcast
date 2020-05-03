@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.mano.hillsongpodcast.db.dao.MediaItemDao
 import com.mano.hillsongpodcast.model.MediaItem
 
-@Database(entities = [MediaItem::class], version = 2)
+@Database(entities = [MediaItem::class], version = 1)
 abstract class MediaItemRoomDB : RoomDatabase() {
 
     abstract fun mediaItemDao() : MediaItemDao
@@ -27,7 +27,7 @@ abstract class MediaItemRoomDB : RoomDatabase() {
                     context.applicationContext,
                     MediaItemRoomDB::class.java,
                     "media_item_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance
             }

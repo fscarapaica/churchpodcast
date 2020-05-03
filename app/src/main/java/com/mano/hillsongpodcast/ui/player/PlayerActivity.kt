@@ -1,78 +1,106 @@
 package com.mano.hillsongpodcast.ui.player
 
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import android.text.format.DateUtils
 import android.util.Log
+import android.view.View
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
+import com.bumptech.glide.Glide
 import com.mano.hillsongpodcast.R
 import com.mano.hillsongpodcast.model.MediaItem
+import com.mano.hillsongpodcast.ui.player.extensions.*
 import com.mano.hillsongpodcast.ui.player.service.MediaPlaybackService
-import com.mano.hillsongpodcast.ui.player.service.MediaPlaybackService2
+import com.mano.hillsongpodcast.ui.player.view.MediaSeekBar
 import com.mano.hillsongpodcast.util.getJsonExtra
+import com.mano.hillsongpodcast.util.putExtraJson
 import kotlinx.android.synthetic.main.activity_player.*
+import kotlinx.android.synthetic.main.player_control_view.*
 
 
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var mediaBrowser: MediaBrowserCompat
 
+    private lateinit var mediaSeekBar: MediaSeekBar
+    private lateinit var playPauseButton: ImageButton
+
+    private var mediaItem: MediaItem? = null
+
+    private val connectionCallBacks = object : MediaBrowserCompat.ConnectionCallback() {
+        override fun onConnected() {
+            mediaBrowser.sessionToken.also { token ->
+                val mediaController = MediaControllerCompat(this@PlayerActivity, token)
+                mediaController.registerCallback(controllerCallback)
+                MediaControllerCompat.setMediaController(this@PlayerActivity, mediaController)
+                mediaSeekBar.setMediaController(mediaController)
+            }
+            val bundle = Bundle()
+            bundle.putExtraJson(mediaItem?.let { mediaItem ->
+                MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, mediaItem.title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, mediaItem.description)
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, mediaItem.image)
+                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, mediaItem.id.toString())
+                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, mediaItem.link)
+                    .putString(MediaMetadataCompat.METADATA_KEY_AUTHOR, mediaItem.author)
+                    .putString(MediaMetadataCompat.METADATA_KEY_DATE, mediaItem.date)
+                    .build()
+            })
+
+            MediaControllerCompat.getMediaController(this@PlayerActivity)
+                .transportControls
+                .prepareFromUri(Uri.parse(mediaItem?.mediaLink), bundle)
+            // TODO: Since when this is call the UI is already build, connects the media controller with the UI
+        }
+
+        override fun onConnectionSuspended() {
+            // TODO: Disable the user UI since the service has crashed
+        }
+
+        override fun onConnectionFailed() {
+            // TODO: the service has refused our connection
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
-        /*
-        // TODO: Set an extra key for the media item
-        val mediaitem = intent.getJsonExtra(MediaItem::class.java)
-        Log.d("PlayerActivity", "lala $mediaitem ")
-
-        val exoPlayer = SimpleExoPlayer.Builder(baseContext).build().apply {
-            playWhenReady = true // Auto play when ready
-        }
-
-        player_control_view.apply {
-            player = exoPlayer
-            showTimeoutMs = 0 // Always show the controllers
-        }
-
-        // Produces DataSource instances through which media data is loaded.
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
-            baseContext,
-            Util.getUserAgent(baseContext, "HillsongPodcast")
-        )
-
-        mediaitem?.link?.let {
-            val audioSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse("https://d9nqqwcssctr8.cloudfront.net/wp-content/uploads/2019/12/05015719/PODCAST-CORAZON-POR-LA-CASA-2019.mp3"))
-            exoPlayer.prepare(audioSource)
-        }
-         */
+        mediaItem = intent.getJsonExtra(MediaItem::class.java)
 
         mediaBrowser = MediaBrowserCompat(this,
             ComponentName(this, MediaPlaybackService::class.java),
             connectionCallBacks,
             null
         )
+
+        mediaSeekBar = exo_progress
+        playPauseButton = exo_play_pause
+        mediaSeekBar.timeEventListener = object : MediaSeekBar.TimeEventListener {
+            override fun onTimeUpdate(timeMs: Int) {
+                exo_position.text = formatElapsedTimeMS(timeMs)
+            }
+
+            override fun onDurationUpdate(durationMs: Int) {
+                exo_duration.text = formatElapsedTimeMS(durationMs)
+            }
+        }
+        ControlsClickListener().apply {
+            playPauseButton.setOnClickListener(this)
+            exo_ffwd.setOnClickListener(this)
+            exo_rew.setOnClickListener(this)
+        }
+        iv_minimize.setOnClickListener {
+            finish()
+        }
     }
 
     override fun onStart() {
@@ -88,32 +116,56 @@ class PlayerActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         MediaControllerCompat.getMediaController(this)?.unregisterCallback(controllerCallback)
+        mediaSeekBar.disconnectController()
         mediaBrowser.disconnect()
     }
 
+    private var controllerCallback = object : MediaControllerCompat.Callback() {
 
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            metadata?.let { metadata ->
+                Glide.with(this@PlayerActivity)
+                    .load(metadata.displayIconUri)
+                    .into(iv_media_image)
+
+                val descriptor = metadata.description
+
+                exo_title.text = metadata.displayTitle
+                exo_description.text = "${metadata.bundle.getString(MediaMetadataCompat.METADATA_KEY_AUTHOR)} · " +
+                        "${metadata.bundle.getString(MediaMetadataCompat.METADATA_KEY_DATE)} · " +
+                        "${metadata.displayDescription} "
+            }
+        }
+
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            playPauseButton.isSelected = state?.state == PlaybackStateCompat.STATE_PLAYING
+            Log.d("PlayerActivity", "$state ")
+        }
+
+    }
+
+    private inner class ControlsClickListener : View.OnClickListener {
+        override fun onClick(view: View) {
+            MediaControllerCompat
+                .getMediaController(this@PlayerActivity)?.let { mediaController ->
+                    when (view.id) {
+                        R.id.exo_ffwd -> mediaController.transportControls.fastForward()
+                        R.id.exo_rew ->  mediaController.transportControls.rewind()
+                        R.id.exo_play_pause -> {
+                            if (mediaController.playbackState.state == PlaybackStateCompat.STATE_PLAYING) {
+                                mediaController.transportControls.pause()
+                                view.isSelected = false
+                            } else {
+                                mediaController.transportControls.play()
+                                view.isSelected = true
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    fun formatElapsedTimeMS(timeMS: Int): String = DateUtils.formatElapsedTime(timeMS/MS_BASE)
 }
 
-class DescriptorAdapter(private val application: Application) : PlayerNotificationManager.MediaDescriptionAdapter {
-    override fun createCurrentContentIntent(player: Player): PendingIntent? {
-        return PendingIntent.getActivity(application,
-            0,
-            Intent(application, PlayerActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
-    override fun getCurrentContentText(player: Player): String? {
-        return null
-    }
-
-    override fun getCurrentContentTitle(player: Player): String {
-        return "getCurrentContentTitle"
-    }
-
-    override fun getCurrentLargeIcon(
-        player: Player,
-        callback: PlayerNotificationManager.BitmapCallback
-    ): Bitmap? {
-        return BitmapFactory.decodeResource(application.resources, R.drawable.hillson_logo)
-    }
-
-}
+private const val MS_BASE = 1000L

@@ -9,18 +9,25 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
 
-class WebScraper {
+object WebScraper {
 
     suspend fun fetchMediaItems(url: String): List<MediaItem> = withContext(Default) {
         val doc: Document = fetchHTMLDocument(url)
         val elements: Elements = doc.getElementsByClass("mashup-item mashup-podcast")
-        return@withContext elements.mapIndexed { index, element ->
+        elements.mapIndexed { index, element ->
             val imageElement = element.getElementsByTag("img")?.attr("src")
             val title = element.getElementsByClass("mashup-title")[0]?.text()
             val blurb = element.getElementsByClass("mashup-blurb")[0]?.text()
             val link = element.getElementsByClass("mashup-text")[0]?.select("a")?.get(0)?.attr("href")
-            return@mapIndexed MediaItem(index, title, blurb, imageElement, link)
+            val author = element.getElementsByClass("author")[0]?.text()
+            val time = element.getElementsByClass("time")[0]?.text()
+            return@mapIndexed MediaItem(index, title, blurb, author, time, imageElement, link)
         }
+    }
+
+    suspend fun fetchMediaTrack(url: String): String? = withContext(Default) {
+        val doc: Document = fetchHTMLDocument(url)
+        doc.getElementsByTag("audio").first().attr("src")
     }
 
     private suspend fun fetchHTMLDocument(url: String): Document = withContext(IO) {

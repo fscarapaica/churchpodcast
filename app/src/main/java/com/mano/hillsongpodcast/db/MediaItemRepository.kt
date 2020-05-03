@@ -16,13 +16,22 @@ class MediaItemRepository(private val mediaItemDao: MediaItemDao) {
 
     suspend fun fetchMediaItems(location: Location) {
         runCatching {
-            WebScraper().fetchMediaItems("https://hillsong.com/es/buenosaires/all/podcasts/")
+            WebScraper.fetchMediaItems("https://hillsong.com/es/${location.link}/all/podcasts/")
         }.onSuccess {
             mediaItemDao.deleteAll()
             mediaItemDao.insert(it)
         }.onFailure {
 
         }
+    }
+
+    suspend fun fetchMediaTrack(link: String): String? {
+        runCatching {
+            return WebScraper.fetchMediaTrack(link)
+        }.onFailure {
+            return it.message
+        }
+        return ""
     }
 
 }

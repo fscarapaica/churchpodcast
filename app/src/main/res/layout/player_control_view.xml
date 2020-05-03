@@ -85,7 +85,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/exo_progress" />
 
-    <com.mano.hillsongpodcast.ui.player.ui.MediaSeekBar
+    <com.mano.hillsongpodcast.ui.player.view.MediaSeekBar
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

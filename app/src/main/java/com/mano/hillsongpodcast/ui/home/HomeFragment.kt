@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mano.hillsongpodcast.R
@@ -28,8 +28,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
         locationAdapter = LocationAdapter(homeViewModel)
@@ -44,15 +43,15 @@ class HomeFragment : Fragment() {
             adapter = mediaItemAdapter
         }
 
-        homeViewModel.locationList.observe(this, Observer { locationList ->
+        homeViewModel.locationList.observe(viewLifecycleOwner, Observer { locationList ->
             locationAdapter.submitList(locationList)
         })
 
-        homeViewModel.mediaItemList.observe(this, Observer { mediaItemList ->
+        homeViewModel.mediaItemList.observe(viewLifecycleOwner, Observer { mediaItemList ->
             mediaItemAdapter.submitList(mediaItemList)
         })
 
-        homeViewModel.mediaItemSelected.observe(this, Observer { mediaItemSelected ->
+        homeViewModel.mediaItemSelected.observe(viewLifecycleOwner, Observer { mediaItemSelected ->
             // TODO: Set an extra key for the media item
             val intent = Intent(context, PlayerActivity::class.java).apply {
                 putExtraJson(mediaItemSelected)
