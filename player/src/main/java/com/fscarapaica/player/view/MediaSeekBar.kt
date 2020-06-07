@@ -1,4 +1,4 @@
-package com.mano.hillsongpodcast.ui.player.view
+package com.fscarapaica.player.view
 
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.view.animation.LinearInterpolator
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSeekBar
-
 
 class MediaSeekBar : AppCompatSeekBar {
 
@@ -69,8 +68,11 @@ class MediaSeekBar : AppCompatSeekBar {
 
     fun setMediaController(mediaController: MediaControllerCompat?) {
         if (mediaController != null) {
-            mControllerCallback = ControllerCallback()
-            mediaController.registerCallback(mControllerCallback!!)
+            mControllerCallback = ControllerCallback().also {
+                mediaController.registerCallback(it)
+                it.onMetadataChanged(mediaController.metadata)
+                it.onPlaybackStateChanged(mediaController.playbackState)
+            }
         } else if (mMediaController != null) {
             mMediaController!!.unregisterCallback(mControllerCallback!!)
             mControllerCallback = null

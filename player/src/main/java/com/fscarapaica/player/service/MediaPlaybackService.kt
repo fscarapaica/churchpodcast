@@ -1,4 +1,4 @@
-package com.mano.hillsongpodcast.ui.player.service
+package com.fscarapaica.player.service
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -16,24 +16,24 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.fscarapaica.player.PodcastPlaybackPreparer
+import com.fscarapaica.player.notification.NOW_PLAYING_NOTIFICATION
+import com.fscarapaica.player.notification.NotificationBuilder
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.mano.hillsongpodcast.ui.player.NOW_PLAYING_NOTIFICATION
-import com.mano.hillsongpodcast.ui.player.NotificationBuilder
-import com.mano.hillsongpodcast.ui.player.PodcastPlaybackPreparer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-
 private const val LOG_TAG = "MediaPlaybackService"
 private const val MY_MEDIA_ROOT_ID = "media_root_id"
 private const val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
+private const val PODCAST_USER_AGENT = "hillsong_podcast"
 
 class MediaPlaybackService: MediaBrowserServiceCompat() {
 
@@ -144,7 +144,7 @@ class MediaPlaybackService: MediaBrowserServiceCompat() {
         private val window = Timeline.Window()
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat =
             player.currentTimeline
-                .getWindow(windowIndex, window, true).tag as MediaDescriptionCompat
+                .getWindow(windowIndex, window).tag as MediaDescriptionCompat
     }
 
     private fun removeNowPlayingNotification() {
@@ -250,5 +250,3 @@ private class BecomingNoisyReceiver(
         }
     }
 }
-
-private const val PODCAST_USER_AGENT = "hillsong_podcast"

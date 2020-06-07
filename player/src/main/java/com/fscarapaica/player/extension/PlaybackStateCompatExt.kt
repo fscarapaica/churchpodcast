@@ -1,4 +1,4 @@
-package com.mano.hillsongpodcast.ui.player.extensions
+package com.fscarapaica.player.extension
 
 import android.support.v4.media.session.PlaybackStateCompat
 
@@ -30,6 +30,11 @@ inline val PlaybackStateCompat.isSkipToNextEnabled
 
 inline val PlaybackStateCompat.isSkipToPreviousEnabled
     get() = actions and PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS != 0L
+
+inline val PlaybackStateCompat.isStopped
+    get() = ((state == PlaybackStateCompat.STATE_NONE) ||
+            (state == PlaybackStateCompat.STATE_STOPPED) ||
+            (state == PlaybackStateCompat.STATE_ERROR))
 
 inline val PlaybackStateCompat.stateName
     get() = when (state) {

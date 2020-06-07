@@ -16,6 +16,9 @@ interface MediaItemDao {
     @Query("SELECT * from media_item_table")
     fun getAllMediaItem() : LiveData<List<MediaItem>>
 
+    @Query("DELETE FROM media_item_table WHERE id = :mediaId")
+    suspend fun deleteAll(mediaId: Int)
+
     @Query("DELETE FROM media_item_table")
     suspend fun deleteAll()
 

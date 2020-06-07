@@ -1,10 +1,11 @@
-package com.mano.hillsongpodcast.ui.player
+package com.fscarapaica.player
 
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import com.fscarapaica.player.extension.fullDescription
+import com.fscarapaica.player.extension.getMediaMetadataCompat
 import com.google.android.exoplayer2.ControlDispatcher
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
@@ -12,8 +13,6 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
-import com.mano.hillsongpodcast.ui.player.extensions.fullDescription
-import com.mano.hillsongpodcast.util.getJsonExtra
 
 class PodcastPlaybackPreparer(
     private val exoPlayer: ExoPlayer,
@@ -30,7 +29,7 @@ class PodcastPlaybackPreparer(
 
     override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle) {
         val audioSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
-            .setTag(extras.getJsonExtra(MediaMetadataCompat::class.java)?.fullDescription())
+            .setTag(extras.getMediaMetadataCompat()?.fullDescription())
             .createMediaSource(uri)
 
         exoPlayer.playWhenReady = true

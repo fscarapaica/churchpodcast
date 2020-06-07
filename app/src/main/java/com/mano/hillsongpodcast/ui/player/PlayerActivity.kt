@@ -14,16 +14,17 @@ import android.view.View
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.fscarapaica.player.extension.displayDescription
+import com.fscarapaica.player.extension.displayIconUri
+import com.fscarapaica.player.extension.displayTitle
+import com.fscarapaica.player.extension.putMediaMetadataCompat
+import com.fscarapaica.player.service.MediaPlaybackService
 import com.mano.hillsongpodcast.R
 import com.mano.hillsongpodcast.model.MediaItem
-import com.mano.hillsongpodcast.ui.player.extensions.*
-import com.mano.hillsongpodcast.ui.player.service.MediaPlaybackService
-import com.mano.hillsongpodcast.ui.player.view.MediaSeekBar
+import com.fscarapaica.player.view.MediaSeekBar
 import com.mano.hillsongpodcast.util.getJsonExtra
-import com.mano.hillsongpodcast.util.putExtraJson
 import kotlinx.android.synthetic.main.activity_player.*
 import kotlinx.android.synthetic.main.player_control_view.*
-
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -41,9 +42,11 @@ class PlayerActivity : AppCompatActivity() {
                 mediaController.registerCallback(controllerCallback)
                 MediaControllerCompat.setMediaController(this@PlayerActivity, mediaController)
                 mediaSeekBar.setMediaController(mediaController)
+                controllerCallback.onMetadataChanged(mediaController.metadata)
+                controllerCallback.onPlaybackStateChanged(mediaController.playbackState)
             }
             val bundle = Bundle()
-            bundle.putExtraJson(mediaItem?.let { mediaItem ->
+            mediaItem?.let { mediaItem ->
                 MediaMetadataCompat.Builder()
                     .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, mediaItem.title)
                     .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, mediaItem.description)
@@ -53,11 +56,13 @@ class PlayerActivity : AppCompatActivity() {
                     .putString(MediaMetadataCompat.METADATA_KEY_AUTHOR, mediaItem.author)
                     .putString(MediaMetadataCompat.METADATA_KEY_DATE, mediaItem.date)
                     .build()
-            })
-
-            MediaControllerCompat.getMediaController(this@PlayerActivity)
-                .transportControls
-                .prepareFromUri(Uri.parse(mediaItem?.mediaLink), bundle)
+            }?.also { mediaMetadataCompat ->
+                bundle.putMediaMetadataCompat(mediaMetadataCompat)
+            }?.also {
+                MediaControllerCompat.getMediaController(this@PlayerActivity)
+                    .transportControls
+                    .prepareFromUri(Uri.parse(mediaItem?.mediaLink), bundle)
+            }
             // TODO: Since when this is call the UI is already build, connects the media controller with the UI
         }
 
@@ -82,6 +87,7 @@ class PlayerActivity : AppCompatActivity() {
             null
         )
 
+        // inflating views
         mediaSeekBar = exo_progress
         playPauseButton = exo_play_pause
         mediaSeekBar.timeEventListener = object : MediaSeekBar.TimeEventListener {
@@ -93,6 +99,8 @@ class PlayerActivity : AppCompatActivity() {
                 exo_duration.text = formatElapsedTimeMS(durationMs)
             }
         }
+
+        //Click listener
         ControlsClickListener().apply {
             playPauseButton.setOnClickListener(this)
             exo_ffwd.setOnClickListener(this)
@@ -166,6 +174,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     fun formatElapsedTimeMS(timeMS: Int): String = DateUtils.formatElapsedTime(timeMS/MS_BASE)
+
 }
 
 private const val MS_BASE = 1000L

@@ -1,12 +1,18 @@
 package com.mano.hillsongpodcast
 
+import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
+import android.support.v4.media.session.MediaControllerCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.mano.hillsongpodcast.ui.player.PlayerActivity
+import com.mano.hillsongpodcast.util.ACTIVITY_PLAYER_REQUEST_CODE
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,7 +20,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
-
+        collapsed_player.setOnClickListener {
+            val intent = Intent(baseContext, PlayerActivity::class.java)
+            startActivityForResult(intent, ACTIVITY_PLAYER_REQUEST_CODE)
+        }
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -26,6 +35,35 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (ACTIVITY_PLAYER_REQUEST_CODE == requestCode) {
+            inflateCollapsedPLayer()
+        }
+    }
+
+    private fun inflateCollapsedPLayer() {
+        collapsed_player.getMediaController(this@MainActivity)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        collapsed_player.connectCollapsedPlayer()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        volumeControlStream = AudioManager.STREAM_MUSIC
+    }
+
+    override fun onStop() {
+        MediaControllerCompat.getMediaController(this).let {
+            collapsed_player.disconnectCollapsedPlayer(it)
+        }
+        super.onStop()
     }
 
 }

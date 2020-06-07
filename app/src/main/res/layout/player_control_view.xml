@@ -45,7 +45,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/exo_ffwd"
         app:layout_constraintStart_toEndOf="@+id/exo_rew"
-        app:srcCompat="@drawable/play_pause_drawable" />
+        app:srcCompat="@drawable/play_pause_circle_drawable" />
 
     <ImageView
         android:id="@+id/exo_favorite"
@@ -85,7 +85,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/exo_progress" />
 
-    <com.mano.hillsongpodcast.ui.player.view.MediaSeekBar
+    <com.fscarapaica.player.view.MediaSeekBar
         android:id="@id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

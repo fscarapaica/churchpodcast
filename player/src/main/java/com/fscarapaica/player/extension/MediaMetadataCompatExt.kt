@@ -1,4 +1,4 @@
-package com.mano.hillsongpodcast.ui.player.extensions
+package com.fscarapaica.player.extension
 
 import android.graphics.Bitmap
 import android.net.Uri

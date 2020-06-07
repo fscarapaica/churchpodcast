@@ -1,11 +1,11 @@
-package com.mano.hillsongpodcast.ui.player
+package com.fscarapaica.player.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -14,13 +14,15 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
-import com.bumptech.glide.Glide
-import com.mano.hillsongpodcast.R
-import com.mano.hillsongpodcast.ui.player.extensions.isPlayEnabled
-import com.mano.hillsongpodcast.ui.player.extensions.isPlaying
-
+import com.fscarapaica.player.R
+import com.fscarapaica.player.extension.isPlayEnabled
+import com.fscarapaica.player.extension.isPlaying
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.MalformedURLException
+import java.net.URL
+
 
 const val NOW_PLAYING_CHANNEL: String = "com.mano.hillsongpodcast.player.NOW_PLAYING"
 const val NOW_PLAYING_NOTIFICATION: Int = 0xb339
@@ -81,20 +83,25 @@ class NotificationBuilder(private val context: Context) {
             .setShowActionsInCompactView(1)
             .setShowCancelButton(true)
 
-        val largeIconBitmap = description.iconUri?.let {
-            resolveUriAsBitmap(context, it)
-        }
+        val largeIconBitmap: Bitmap?= description.iconUri?.let {
+            try {
+                resolveUriAsBitmap(context, URL(it.toString()))
+            } catch (e: MalformedURLException) {
+                // TODO: Catch, log, report this error
+            }
+        } as Bitmap?
 
-        return builder.setContentIntent(controller.sessionActivity)
-            .setContentText(description.subtitle)
-            .setContentTitle(description.title)
-            .setDeleteIntent(stopPendingIntent)
-            .setLargeIcon(largeIconBitmap)
-            .setOnlyAlertOnce(true)
-            .setSmallIcon(R.mipmap.ic_launcher_foreground)
-            .setStyle(mediaStyle)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
+        return builder.apply {
+            setContentIntent(controller.sessionActivity)
+            setContentText(description.subtitle)
+            setContentTitle(description.title)
+            setDeleteIntent(stopPendingIntent)
+            setLargeIcon(largeIconBitmap)
+            setOnlyAlertOnce(true)
+            setSmallIcon(R.drawable.ic_player_notitification)
+            setStyle(mediaStyle)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        }.build()
     }
 
     private fun shouldCreateNowPlayingChannel() =
@@ -119,15 +126,14 @@ class NotificationBuilder(private val context: Context) {
         platformNotificationManager.createNotificationChannel(notificationChannel)
     }
 
-    private suspend fun resolveUriAsBitmap(context: Context, url: Uri): Bitmap? {
+    private suspend fun resolveUriAsBitmap(context: Context, url: URL): Bitmap? {
         return withContext(Dispatchers.IO) {
-            Glide.
-                with(context).
-                asBitmap().
-                load(url).
-                submit()
-                .get()
-        }
+            try {
+                BitmapFactory.decodeStream(url.openConnection().getInputStream())
+            } catch (e: IOException) {
+                // TODO: Catch, log, report this error
+            }
+        } as Bitmap?
     }
 
 }

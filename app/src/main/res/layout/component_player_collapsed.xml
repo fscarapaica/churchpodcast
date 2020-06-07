@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <com.fscarapaica.player.view.MediaSeekBar
+            android:id="@id/exo_progress"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:progressDrawable="@drawable/progress_collapsed_drawable"
+            android:background="@color/transparent"
+            android:thumb="@color/transparent"
+            tools:progress="45"/>
+
+        <LinearLayout
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_media_image"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    app:srcCompat="@drawable/hillson_logo" />
+
+                <TextView
+                    android:id="@+id/exo_title"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="This is a foo text too long long long long to be "/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/exo_play_pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:srcCompat="@drawable/play_pause_arrow_drawable"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:srcCompat="@drawable/ic_close_white_24dp"/>
+
+        </LinearLayout>
+
+</merge>
+

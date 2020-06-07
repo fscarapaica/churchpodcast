@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.mano.hillsongpodcast">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -23,15 +25,18 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
         <activity android:name=".ui.player.PlayerActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <service android:name=".ui.player.service.MediaPlaybackService"
+        <service android:name="com.fscarapaica.player.service.MediaPlaybackService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />

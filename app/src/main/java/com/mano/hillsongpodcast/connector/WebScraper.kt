@@ -8,20 +8,19 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
-
 object WebScraper {
 
     suspend fun fetchMediaItems(url: String): List<MediaItem> = withContext(Default) {
         val doc: Document = fetchHTMLDocument(url)
         val elements: Elements = doc.getElementsByClass("mashup-item mashup-podcast")
-        elements.mapIndexed { index, element ->
+        elements.map { element ->
             val imageElement = element.getElementsByTag("img")?.attr("src")
             val title = element.getElementsByClass("mashup-title")[0]?.text()
             val blurb = element.getElementsByClass("mashup-blurb")[0]?.text()
             val link = element.getElementsByClass("mashup-text")[0]?.select("a")?.get(0)?.attr("href")
             val author = element.getElementsByClass("author")[0]?.text()
             val time = element.getElementsByClass("time")[0]?.text()
-            return@mapIndexed MediaItem(index, title, blurb, author, time, imageElement, link)
+            return@map MediaItem(title, blurb, author, time, imageElement, link)
         }
     }
 

@@ -14,6 +14,7 @@ import com.mano.hillsongpodcast.R
 import com.mano.hillsongpodcast.ui.adapter.LocationAdapter
 import com.mano.hillsongpodcast.ui.adapter.MediaItemAdapter
 import com.mano.hillsongpodcast.ui.player.PlayerActivity
+import com.mano.hillsongpodcast.util.ACTIVITY_PLAYER_REQUEST_CODE
 import com.mano.hillsongpodcast.util.putExtraJson
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
@@ -56,7 +57,7 @@ class HomeFragment : Fragment() {
             val intent = Intent(context, PlayerActivity::class.java).apply {
                 putExtraJson(mediaItemSelected)
             }
-            startActivity(intent)
+            activity?.startActivityForResult(intent, ACTIVITY_PLAYER_REQUEST_CODE)
         })
 
         homeViewModel.updateContent()
