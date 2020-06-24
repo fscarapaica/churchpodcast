@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 private const val LOG_TAG = "MediaPlaybackService"
 private const val MY_MEDIA_ROOT_ID = "media_root_id"
 private const val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
-private const val PODCAST_USER_AGENT = "hillsong_podcast"
+private const val PODCAST_USER_AGENT = "church_podcast"
 
 class MediaPlaybackService: MediaBrowserServiceCompat() {
 

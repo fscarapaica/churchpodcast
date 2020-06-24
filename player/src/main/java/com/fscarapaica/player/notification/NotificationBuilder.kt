@@ -19,12 +19,11 @@ import com.fscarapaica.player.extension.isPlayEnabled
 import com.fscarapaica.player.extension.isPlaying
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 
 
-const val NOW_PLAYING_CHANNEL: String = "com.mano.hillsongpodcast.player.NOW_PLAYING"
+const val NOW_PLAYING_CHANNEL: String = "com.mano.churchpodcast.player.NOW_PLAYING"
 const val NOW_PLAYING_NOTIFICATION: Int = 0xb339
 
 /**
@@ -83,7 +82,7 @@ class NotificationBuilder(private val context: Context) {
             .setShowActionsInCompactView(1)
             .setShowCancelButton(true)
 
-        val largeIconBitmap: Bitmap?= description.iconUri?.let {
+        val largeIconBitmap: Bitmap? = description.iconUri?.let {
             try {
                 resolveUriAsBitmap(context, URL(it.toString()))
             } catch (e: MalformedURLException) {
@@ -129,11 +128,12 @@ class NotificationBuilder(private val context: Context) {
     private suspend fun resolveUriAsBitmap(context: Context, url: URL): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
-                BitmapFactory.decodeStream(url.openConnection().getInputStream())
-            } catch (e: IOException) {
+                BitmapFactory.decodeStream(url.openConnection().getInputStream()) as Bitmap?
+            } catch (e: Exception) {
+                null
                 // TODO: Catch, log, report this error
             }
-        } as Bitmap?
+        }
     }
 
 }

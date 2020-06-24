@@ -1,3 +1,1 @@
-include ':app'
-rootProject.name='Hillsong Podcast'
-include ':player'
+include ':app', ':player'
