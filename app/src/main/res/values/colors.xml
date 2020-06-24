@@ -7,10 +7,13 @@
 
 
     <color name="black">#000000</color>
+    <color name="black_15">#80000000</color>
 
     <color name="transparent">#00000000</color>
 
     <color name="white_25">#3FFFFFFF</color>
     <color name="white_15">#26FFFFFF</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="yellow_gold">#FFD700</color>
 </resources>

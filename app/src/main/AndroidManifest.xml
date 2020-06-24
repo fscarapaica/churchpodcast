@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mano.hillsongpodcast">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.mano.churchpodcast">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -12,8 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".SplashActivity"
+            android:name="com.mano.churchpodcast.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,15 +25,19 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".MainActivity"
+            android:name="com.mano.churchpodcast.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
-        <activity android:name=".ui.player.PlayerActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity android:name="com.mano.churchpodcast.ui.player.PlayerActivity"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <service android:name=".ui.player.service.MediaPlaybackService"
+        <service android:name="com.fscarapaica.player.service.MediaPlaybackService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
