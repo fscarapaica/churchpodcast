@@ -1,96 +1,82 @@
 package com.mano.churchpodcast.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mano.churchpodcast.R
-import com.mano.churchpodcast.ui.adapter.LocationAdapter
-import com.mano.churchpodcast.ui.adapter.MediaItemAdapter
-import com.mano.churchpodcast.ui.player.PlayerActivity
-import com.mano.churchpodcast.util.ACTIVITY_PLAYER_REQUEST_CODE
-import com.mano.churchpodcast.util.getLocation
-import com.mano.churchpodcast.util.getSharedPreferences
-import com.mano.churchpodcast.util.putExtraJson
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
+import androidx.recyclerview.widget.RecyclerView
+import com.mano.churchpodcast.databinding.FragmentHomeBinding
+import com.mano.churchpodcast.ext.navigateYoutubePlayer
+import com.mano.churchpodcast.ui.MainActivityViewModel
+import com.mano.churchpodcast.ui.adapter.YoutubeVideoAdapter
 
 class HomeFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
-    private lateinit var locationAdapter: LocationAdapter
-    private lateinit var mediaItemAdapter: MediaItemAdapter
+    private val homeViewModel: HomeViewModel by viewModels()
+    private val activityViewModel: MainActivityViewModel by activityViewModels()
+    private lateinit var youtubeVideoAdapter: YoutubeVideoAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        val fragmentBinding = FragmentHomeBinding.inflate(inflater)
 
-        locationAdapter = LocationAdapter(homeViewModel)
-        root.rv_location.run {
-            layoutManager = GridLayoutManager(context, 3)
-            adapter = locationAdapter
+        activityViewModel.selectedLocation.observe(viewLifecycleOwner, { location ->
+            homeViewModel.onLocationChange(location)
+        })
+
+        fragmentBinding.swipeRefresh.setOnRefreshListener {
+            homeViewModel.updateContent()
         }
 
-        mediaItemAdapter = MediaItemAdapter(homeViewModel)
-        root.rv_media_item.run {
-            layoutManager = LinearLayoutManager(context)
-            adapter = mediaItemAdapter
-        }
-
-        homeViewModel.locationList.observe(viewLifecycleOwner, Observer { locationList ->
-            locationAdapter.submitList(locationList, context?.getSharedPreferences()?.getLocation())
-        })
-
-        homeViewModel.mediaItemList.observe(viewLifecycleOwner, Observer { mediaItemList ->
-            mediaItemAdapter.submitList(mediaItemList)
-        })
-
-        homeViewModel.mediaItemSelected.observe(viewLifecycleOwner, Observer { mediaItemSelected ->
-            // TODO: Set an extra key for the media item
-            val intent = Intent(context, PlayerActivity::class.java).apply {
-                putExtraJson(mediaItemSelected)
-            }
-
-            activity?.startActivityForResult(intent, ACTIVITY_PLAYER_REQUEST_CODE)
-        })
-
-        homeViewModel.networkStatus.observe(viewLifecycleOwner, Observer { networkStatatus ->
-            networkStatatus?.let {
-                if (networkStatatus == HomeViewModel.NetworkStatus.LOADING) {
-                    loaderOverlapVisibility(true)
-                } else if (networkStatatus == HomeViewModel.NetworkStatus.DONE) {
-                    loaderOverlapVisibility(false)
+        fragmentBinding.rvMediaItem.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                fragmentBinding.swipeRefresh.apply {
+                    if ((isEnabled xor !recyclerView.canScrollVertically(-1))
+                        and !isRefreshing
+                    ) {
+                        isEnabled = isEnabled.not()
+                    }
+                }
+                if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    homeViewModel.getNextPage()
                 }
             }
         })
 
-        homeViewModel.updateContent()
-
-        return root
-    }
-
-    private fun loaderOverlapVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            loading_overlap.visibility = VISIBLE
-            activity?.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        } else {
-            loading_overlap.visibility = INVISIBLE
-            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        youtubeVideoAdapter = YoutubeVideoAdapter(homeViewModel)
+        fragmentBinding.rvMediaItem.run {
+            layoutManager = LinearLayoutManager(context)
+            adapter = youtubeVideoAdapter
         }
+
+        homeViewModel.youtubeVideoList.observe(viewLifecycleOwner, { youtubeVideoList ->
+            youtubeVideoAdapter.submitList(youtubeVideoList)
+        })
+
+        homeViewModel.networkStatus.observe(viewLifecycleOwner, { networkStatus ->
+            networkStatus?.let {
+                if (networkStatus == HomeViewModel.NetworkStatus.LOADING) {
+                    fragmentBinding.swipeRefresh.isRefreshing = true
+                } else if (networkStatus == HomeViewModel.NetworkStatus.DONE) {
+                    fragmentBinding.swipeRefresh.isRefreshing = false
+                }
+            }
+        })
+
+        homeViewModel.selectedVideo.observe(viewLifecycleOwner, { selectedYoutubeVideo ->
+            if (selectedYoutubeVideo != null) {
+                navigateYoutubePlayer(selectedYoutubeVideo)
+            }
+        })
+
+        return fragmentBinding.root
     }
 
 }

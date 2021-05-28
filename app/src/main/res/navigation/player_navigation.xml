@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_blank_fragment">
+
+    <fragment
+        android:id="@+id/navigation_youtube_player"
+        android:name="com.mano.churchpodcast.ui.player.YoutubePlayerFragment"
+        android:label="youtube_player_fragment"
+        tools:layout="@layout/fragment_youtube_player" />
+
+    <fragment
+        android:id="@+id/navigation_exo_player"
+        android:name="com.mano.churchpodcast.ui.player.ExoPlayerFragment"
+        android:label="exo_player_fragment"
+        tools:layout="@layout/fragment_exo_player" />
+
+    <fragment
+        android:id="@+id/navigation_blank_fragment"
+        android:name="androidx.fragment.app.Fragment" />
+
+</navigation>

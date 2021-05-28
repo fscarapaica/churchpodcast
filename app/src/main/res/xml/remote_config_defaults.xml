@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>location_list</key>
+        <value>
+            [
+            {
+            "name": "Monterrey",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg",
+            "link": "https://hillsong.com/mexico/monterrey/all/podcasts/",
+            "jesus": "https://hillsong.com/mexico/monterrey/jesus/",
+            "channelId": "UCuEQdJ0OFVgCOp8k50fVoZQ",
+            "comingSoon": false
+            },
+            {
+            "name": "Buenos Aires",
+            "image": "https://images.clarin.com/2018/11/22/Az0o4AN5D_1256x620__1.jpg",
+            "link": "https://hillsong.com/argentina/buenosaires/all/podcasts/",
+            "jesus": "https://hillsong.com/argentina/buenosaires/jesus",
+            "channelId": "UCBlhI4thciKCIW2kkH6AggQ",
+            "comingSoon": false
+            },
+            {
+            "name": "Sao Pablo",
+            "image": "https://images.fridaymagazine.ae/1_2304285/imagesList_0/2456872028_main.jpg",
+            "link": "https://hillsong.com/brazil/saopaulo/all/podcasts/",
+            "jesus": "https://hillsong.com/brazil/saopaulo/jesus/",
+            "channelId": "UCXxrdKA3RJx2sFKB-6M0wgw",
+            "comingSoon": false
+            },
+            {
+            "name": "Montevideo",
+            "image": "https://d1xpblio32ctey.cloudfront.net/wp-content/uploads/2019/02/15055407/VS19_MV.jpg",
+            "link": "",
+            "jesus": "",
+            "channelId": "",
+            "comingSoon": true
+            }
+            ]
+        </value>
+        <key>podcast_playlist</key>
+        <value>
+            [
+            {
+            "id": "PLFdJznB1dRpKsOjWvl6TBO8oOAzWyOGiA",
+            "name": "Liderazgo sin Censura",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg",
+            "season": "3",
+            "comingSoon": false
+            }
+            ]
+        </value>
+    </entry>
+</defaultsMap>

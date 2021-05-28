@@ -19,7 +19,6 @@ import com.fscarapaica.player.extension.isPlayEnabled
 import com.fscarapaica.player.extension.isPlaying
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.MalformedURLException
 import java.net.URL
 
 
@@ -56,7 +55,7 @@ class NotificationBuilder(private val context: Context) {
     private val stopPendingIntent =
         MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_STOP)
 
-    suspend fun buildNotification(sessionToken: MediaSessionCompat.Token): Notification {
+    fun buildNotification(sessionToken: MediaSessionCompat.Token): Notification {
         if (shouldCreateNowPlayingChannel()) {
             createNowPlayingChannel()
         }
@@ -82,20 +81,20 @@ class NotificationBuilder(private val context: Context) {
             .setShowActionsInCompactView(1)
             .setShowCancelButton(true)
 
-        val largeIconBitmap: Bitmap? = description.iconUri?.let {
-            try {
-                resolveUriAsBitmap(context, URL(it.toString()))
-            } catch (e: MalformedURLException) {
-                // TODO: Catch, log, report this error
-            }
-        } as Bitmap?
+//        val largeIconBitmap: Bitmap? = description.iconUri?.let {
+//            try {
+//                //resolveUriAsBitmap(URL(it.toString()))
+//            } catch (e: MalformedURLException) {
+//                // TODO: Catch, log, report this error
+//            }
+//        } as Bitmap?
 
         return builder.apply {
             setContentIntent(controller.sessionActivity)
             setContentText(description.subtitle)
             setContentTitle(description.title)
             setDeleteIntent(stopPendingIntent)
-            setLargeIcon(largeIconBitmap)
+            //setLargeIcon(largeIconBitmap)
             setOnlyAlertOnce(true)
             setSmallIcon(R.drawable.ic_player_notitification)
             setStyle(mediaStyle)
@@ -125,10 +124,10 @@ class NotificationBuilder(private val context: Context) {
         platformNotificationManager.createNotificationChannel(notificationChannel)
     }
 
-    private suspend fun resolveUriAsBitmap(context: Context, url: URL): Bitmap? {
+    private suspend fun resolveUriAsBitmap(url: URL): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
-                BitmapFactory.decodeStream(url.openConnection().getInputStream()) as Bitmap?
+                BitmapFactory.decodeStream(url.openConnection().getInputStream())
             } catch (e: Exception) {
                 null
                 // TODO: Catch, log, report this error

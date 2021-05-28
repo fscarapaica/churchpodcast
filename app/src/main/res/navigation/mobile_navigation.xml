@@ -22,4 +22,5 @@
         android:name="com.mano.churchpodcast.ui.library.LibraryFragment"
         android:label="@string/title_library"
         tools:layout="@layout/fragment_library" />
+
 </navigation>

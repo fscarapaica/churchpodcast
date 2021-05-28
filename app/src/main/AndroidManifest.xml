@@ -3,19 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mano.churchpodcast">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
-        android:allowBackup="true"
+        android:name=".ApplicationBase"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar"
+        android:fullBackupContent="@xml/backup_descriptor">
 
         <activity
-            android:name="com.mano.churchpodcast.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,17 +30,14 @@
         </activity>
 
         <activity
-            android:name="com.mano.churchpodcast.MainActivity"
-            android:configChanges="orientation|keyboardHidden"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".ui.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
-        <activity android:name="com.mano.churchpodcast.ui.player.PlayerActivity"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <service android:name="com.fscarapaica.player.service.MediaPlaybackService"
+        <service
+            android:name="com.fscarapaica.player.service.MediaPlaybackService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
@@ -49,6 +49,16 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove" />
     </application>
+
+    <queries>
+        <package android:name="com.google.android.youtube" />
+    </queries>
 
 </manifest>

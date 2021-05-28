@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/t_youtube_player_down_move"
+        motion:constraintSetStart="@id/cs_youtube_player_start"
+        motion:constraintSetEnd="@+id/cs_youtube_player_transition"
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragDown"
+            motion:onTouchUp="autoCompleteToStart"
+            motion:touchRegionId="@id/player_container" />
+    </Transition>
+
+    <Transition
+        android:id="@+id/t_youtube_player_down_resize"
+        motion:constraintSetStart="@+id/cs_youtube_player_transition"
+        motion:constraintSetEnd="@+id/cs_youtube_player_end"
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragDown"
+            motion:onTouchUp="autoCompleteToEnd"
+            motion:touchRegionId="@id/player_container" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_start" />
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_transition">
+
+        <Constraint
+            android:id="@+id/iv_media_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent" />
+
+        <Constraint
+            android:layout_height="0dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/iv_media_image"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:id="@+id/player_container" />
+
+        <Constraint
+            android:id="@+id/include"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            motion:layout_constraintTop_toBottomOf="@+id/iv_media_image" />
+
+        <Constraint
+            android:id="@+id/iv_minimize"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="24dp"
+            motion:layout_constraintTop_toTopOf="@id/player_container"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            android:alpha="0" />
+
+        <Constraint
+            android:id="@+id/iv_share"
+            motion:layout_constraintTop_toTopOf="@id/player_container"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_end"
+        motion:deriveConstraintsFrom="@+id/cs_youtube_player_transition">
+
+        <Constraint
+            android:layout_height="80dp"
+            android:layout_width="wrap_content"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/iv_media_image" />
+
+        <Constraint
+            android:id="@+id/iv_minimize"
+            android:visibility="gone" />
+
+        <Constraint
+            android:id="@+id/iv_share"
+            android:visibility="gone" />
+
+        <Constraint
+            android:id="@id/exo_progress_collapsed"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:visibility="visible"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/player_container" />
+
+        <Constraint
+            android:id="@+id/include_collapsed"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintTop_toTopOf="@id/iv_media_image"
+            motion:layout_constraintStart_toEndOf="@+id/iv_media_image" />
+
+    </ConstraintSet>
+
+</MotionScene>

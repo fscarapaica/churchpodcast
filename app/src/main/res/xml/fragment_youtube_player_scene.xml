@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/t_youtube_player_down_move"
+        motion:constraintSetStart="@id/cs_youtube_player_start"
+        motion:constraintSetEnd="@+id/cs_youtube_player_transition"
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragDown"
+            motion:onTouchUp="autoCompleteToStart"
+            motion:touchRegionId="@+id/player_container" />
+    </Transition>
+
+    <Transition
+        android:id="@+id/t_youtube_player_down_resize"
+        motion:constraintSetStart="@+id/cs_youtube_player_transition"
+        motion:constraintSetEnd="@+id/cs_youtube_player_end"
+        motion:duration="200">
+        <OnSwipe
+            motion:dragDirection="dragDown"
+            motion:onTouchUp="autoCompleteToEnd"
+            motion:touchRegionId="@+id/player_container" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_start" />
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_transition">
+
+        <Constraint android:id="@+id/youtube_player_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent" />
+
+        <Constraint android:id="@+id/player_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="@+id/youtube_player_view"
+            motion:layout_constraintTop_toTopOf="@+id/youtube_player_view" />
+
+        <Constraint android:id="@+id/rv_next_video"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            motion:layout_constraintTop_toBottomOf="@+id/info_section" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/cs_youtube_player_end"
+        motion:deriveConstraintsFrom="@+id/cs_youtube_player_transition">
+
+        <Constraint
+            android:id="@+id/youtube_player_view"
+            motion:layout_constraintLeft_toLeftOf="parent"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="110dp"
+            android:layout_width="200dp" />
+
+    </ConstraintSet>
+
+</MotionScene>

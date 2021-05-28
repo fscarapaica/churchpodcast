@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Church Podcast Hillsong</string>
+    <string name="title_home">Casa</string>
+    <string name="title_discover">Descobrir</string>
+    <string name="title_library">Biblioteca</string>
+
+    <string name="tv_home_latest">Recente</string>
+    <string name="jesus">Jesus</string>
+
+    <string name="playlist_description">Temporada %d</string>
+</resources>

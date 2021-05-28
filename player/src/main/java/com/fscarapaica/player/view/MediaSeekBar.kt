@@ -45,15 +45,15 @@ class MediaSeekBar : AppCompatSeekBar {
             }
         }
 
-    constructor(context: Context?) : super(context) {
+    constructor(context: Context) : super(context) {
         super.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         super.setOnSeekBarChangeListener(mOnSeekBarChangeListener)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
@@ -86,12 +86,21 @@ class MediaSeekBar : AppCompatSeekBar {
             mControllerCallback = null
             mMediaController = null
         }
-        timeEventListener = null
+        clearProgressAnimator()
     }
 
     private fun updateProgress(currentProgress: Int) {
-        progress = currentProgress
-        timeEventListener?.onTimeUpdate(currentProgress)
+        if (progress != currentProgress) {
+            progress = currentProgress
+            timeEventListener?.onTimeUpdate(currentProgress)
+        }
+    }
+
+    fun clearProgressAnimator() {
+        mProgressAnimator?.apply {
+            cancel()
+            mProgressAnimator = null
+        }
     }
 
     private inner class ControllerCallback : MediaControllerCompat.Callback(),
@@ -100,10 +109,7 @@ class MediaSeekBar : AppCompatSeekBar {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
             super.onPlaybackStateChanged(state)
 
-            mProgressAnimator?.apply {
-                cancel()
-                mProgressAnimator = null
-            }
+            clearProgressAnimator()
 
             updateProgress(state.position.toInt())
 
@@ -135,5 +141,7 @@ class MediaSeekBar : AppCompatSeekBar {
             }
             updateProgress(valueAnimator.animatedValue as Int)
         }
+
     }
+
 }

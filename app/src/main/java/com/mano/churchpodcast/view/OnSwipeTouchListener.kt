@@ -3,54 +3,42 @@ package com.mano.churchpodcast.view
 import android.content.Context
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.*
 import android.view.View
+import android.view.ViewConfiguration
 import kotlin.math.abs
 
-// TODO: REWORK THE SWIPE ANIMATION
 internal open class OnSwipeTouchListener(c: Context,val view: View) : View.OnTouchListener {
+
     private val gestureDetector: GestureDetector
-    private val resetX = view.x
+    private val swipeThreshold: Int = ViewConfiguration.get(c).scaledPagingTouchSlop * 3
+
+    private var currentDownEvent: MotionEvent? = null
+
+    var isGestureEnable = false
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
-        if (motionEvent.action == ACTION_UP) {
-            view.translationX = resetX
-        }
-        return gestureDetector.onTouchEvent(motionEvent)
-    }
-
-
-
-    private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
-        private val SWIPE_THRESHOLD: Int = 100
-        private val SWIPE_VELOCITY_THRESHOLD: Int = 100
-
-        override fun onDown(e: MotionEvent): Boolean {
-            return true
-        }
-
-        override fun onFling(
-            e1: MotionEvent,
-            e2: MotionEvent,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            try {
-                val diffX = e2.x - e1.x
-                if (abs(diffX) > SWIPE_THRESHOLD && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+        return if (isGestureEnable) {
+            if (motionEvent.action == ACTION_DOWN) {
+                currentDownEvent = obtain(motionEvent)
+            } else if (motionEvent.action == ACTION_UP && currentDownEvent != null) {
+                val diffX = motionEvent.rawX - currentDownEvent!!.rawX
+                if (abs(diffX) > swipeThreshold) {
                     if (diffX > 0) {
                         onSwipeRight()
                     }
-                    else {
-                        onSwipeLeft()
-                    }
-                }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
+                } else view.translationX = 0f
             }
-            return false
+            gestureDetector.onTouchEvent(motionEvent)
+        } else {
+            if (view.translationX != 0f) {
+                view.translationX = 0f
+            }
+            false
         }
+    }
 
+    private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(
             e1: MotionEvent?,
             e2: MotionEvent?,
@@ -59,13 +47,16 @@ internal open class OnSwipeTouchListener(c: Context,val view: View) : View.OnTou
         ): Boolean {
             if (e1 != null && e2 != null) {
                 val diffX = e2.x - e1.x
-                view.translationX = view.translationX + diffX
+                val relativePosition = view.translationX + diffX
+                if (relativePosition > 0) {
+                    view.translationX = relativePosition
+                } else view.translationX = 0f
             }
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
     }
-    open fun onSwipeRight() {}
-    open fun onSwipeLeft() {}
+
+    open fun onSwipeRight() { }
 
     init {
         gestureDetector = GestureDetector(c, GestureListener())
