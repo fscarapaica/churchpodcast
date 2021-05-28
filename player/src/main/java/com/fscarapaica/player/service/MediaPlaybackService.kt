@@ -34,6 +34,8 @@ private const val LOG_TAG = "MediaPlaybackService"
 private const val MY_MEDIA_ROOT_ID = "media_root_id"
 private const val MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id"
 private const val PODCAST_USER_AGENT = "church_podcast"
+private const val MIN_BUFFER_MS = 5_000
+private const val MAX_BUFFER_MS = 5_000
 
 class MediaPlaybackService: MediaBrowserServiceCompat() {
 
@@ -55,13 +57,23 @@ class MediaPlaybackService: MediaBrowserServiceCompat() {
         .setUsage(C.USAGE_MEDIA)
         .build()
 
+    private val customLoadControl = DefaultLoadControl.Builder()
+        .setBufferDurationsMs(
+            MIN_BUFFER_MS,
+            MAX_BUFFER_MS,
+            DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+            DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+        ).build()
+
     /**
      * Configure ExoPlayer to handle audio focus for us.
      * See [Player.AudioComponent.setAudioAttributes] for details.
      *
      */
     private val exoPlayer: ExoPlayer by lazy {
-        SimpleExoPlayer.Builder(baseContext).build().apply {
+        SimpleExoPlayer
+            .Builder(baseContext)
+            .setLoadControl(customLoadControl).build().apply {
             playWhenReady = true
             setAudioAttributes(uAmpAudioAttributes, true)
         }
