@@ -30,11 +30,21 @@ class PlaylistAdapter(private val interaction: Interaction? = null) :
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ExpandableModel>() {
 
             override fun areItemsTheSame(oldItem: ExpandableModel, newItem: ExpandableModel): Boolean {
-                return oldItem == newItem
+                return when (oldItem) {
+                    is ExpandableModel.PlaylistModel -> oldItem.playlist.id
+                    is ExpandableModel.MediaItemModel -> oldItem.mediaItem.id
+                } == when (newItem) {
+                    is ExpandableModel.PlaylistModel -> newItem.playlist.id
+                    is ExpandableModel.MediaItemModel -> newItem.mediaItem.id
+                }
             }
 
             override fun areContentsTheSame(oldItem: ExpandableModel, newItem: ExpandableModel): Boolean {
-                return oldItem == newItem
+                return when (oldItem) {
+                    is ExpandableModel.PlaylistModel ->
+                        oldItem.playlist.mediaItems.count() == (newItem as ExpandableModel.PlaylistModel).playlist.mediaItems.count()
+                    is ExpandableModel.MediaItemModel -> oldItem == newItem
+                }
             }
 
         }
@@ -86,8 +96,8 @@ class PlaylistAdapter(private val interaction: Interaction? = null) :
         return differ.currentList.size
     }
 
-
     fun submitList(list: List<Playlist>) {
+        notifyDataSetChanged()
         differ.submitList(list.toListExpandableModel())
     }
 
@@ -102,6 +112,11 @@ class PlaylistAdapter(private val interaction: Interaction? = null) :
                     interaction?.onPlaylistSelected(playlist, position, isExpanded)
                 }
             }
+
+            val indicatorResource = if (playlistModel.isExpanded) R.drawable.ic_close_white_24dp
+            else R.drawable.ic_baseline_chevron_right_24
+            viewBinding.listIndicator.setImageResource(indicatorResource)
+
             playlistModel.playlist.run {
                 viewBinding.playlistName.text = name
                 viewBinding.playlistDescription.text = context.getString(R.string.playlist_description, season)
@@ -161,7 +176,8 @@ class PlaylistAdapter(private val interaction: Interaction? = null) :
         data class PlaylistModel(val playlist: Playlist,
                                  val position: Int,
         ): ExpandableModel(TYPE_PLAYLIST) {
-            var isExpanded: Boolean = playlist.mediaItems.isNotEmpty()
+            val isExpanded: Boolean
+                get() = playlist.mediaItems.isNotEmpty()
         }
 
         data class MediaItemModel(val mediaItem: MediaItem
