@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -86,6 +87,8 @@ class YoutubePlayerFragment: Fragment(), YouTubePlayer.OnInitializedListener {
             }
         })
 
+        activity?.onBackPressedDispatcher?.addCallback(onBackPressedCallback)
+
         youtubePlayerViewModel.currentYoutubeVideo.value = youtubeVideo
 
         return fragmentBinding.root
@@ -162,9 +165,11 @@ class YoutubePlayerFragment: Fragment(), YouTubePlayer.OnInitializedListener {
         override fun onTransitionCompleted(motionLayout: MotionLayout?, constraintId: Int) {
             when(constraintId) {
                 R.id.cs_youtube_player_start -> {
+                    onBackPressedCallback.isEnabled = true
                     youTubePlayer?.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT)
                 }
                 R.id.cs_youtube_player_end -> {
+                    onBackPressedCallback.isEnabled = false
                     youTubePlayer?.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS)
                 }
             }
@@ -176,6 +181,16 @@ class YoutubePlayerFragment: Fragment(), YouTubePlayer.OnInitializedListener {
 
         override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) { }
 
+    }
+
+    val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            fragmentBinding.motionBase.apply {
+                if (currentState == startState) {
+                    transitionToEnd()
+                } else activity?.onBackPressed()
+            }
+        }
     }
 
 }
