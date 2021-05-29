@@ -1,5 +1,6 @@
 package com.mano.churchpodcast.ext
 
+import androidx.annotation.Keep
 import com.google.firebase.firestore.DocumentSnapshot
 import com.mano.churchpodcast.model.MediaItem
 import com.mano.churchpodcast.model.YoutubeVideo
@@ -16,6 +17,8 @@ suspend fun DocumentSnapshot.toMediaItemList(): List<MediaItem> =
         toObject(PlaylistDocument::class.java)!!.mediaItem
     }
 
+@Keep
 data class YoutubeVideoDocument(val id: Long = 0, val videos: ArrayList<YoutubeVideo> = ArrayList())
 
+@Keep
 data class PlaylistDocument(val mediaItem: ArrayList<MediaItem> = ArrayList())
