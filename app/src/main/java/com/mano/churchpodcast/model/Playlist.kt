@@ -1,5 +1,8 @@
 package com.mano.churchpodcast.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class Playlist(val id: String = "",
                     val name: String = "",
                     val imageUrl: String = "",
