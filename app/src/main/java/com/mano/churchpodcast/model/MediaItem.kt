@@ -1,10 +1,12 @@
 package com.mano.churchpodcast.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
 @Entity(tableName = "media_item_table")
 data class MediaItem(val title: String? = "",

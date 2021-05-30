@@ -38,6 +38,8 @@
             }
             ]
         </value>
+    </entry>
+    <entry>
         <key>podcast_playlist</key>
         <value>
             [
@@ -46,6 +48,20 @@
             "name": "Liderazgo sin Censura",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg",
             "season": "3",
+            "comingSoon": false
+            },
+            {
+            "id": "PLFdJznB1dRpKsyxESYWW1aPygQwOlU2eh",
+            "name": "Liderazgo sin Censura",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg",
+            "season": "2",
+            "comingSoon": false
+            },
+            {
+            "id": "PLFdJznB1dRpJ_pDhDd7Br2DIoGQdduwR6",
+            "name": "Liderazgo sin Censura",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/DelValleCity.jpg/450px-DelValleCity.jpg",
+            "season": "1",
             "comingSoon": false
             }
             ]

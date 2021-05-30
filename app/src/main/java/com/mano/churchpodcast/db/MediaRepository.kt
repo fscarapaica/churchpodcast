@@ -4,8 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.android.gms.tasks.Tasks.await
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
+import com.google.firebase.ktx.Firebase
 import com.mano.churchpodcast.ext.toMediaItemList
 import com.mano.churchpodcast.ext.toYoutubeVideoList
 import com.mano.churchpodcast.model.Location
@@ -50,50 +53,54 @@ class MediaRepository(context: Context) {
         youtubeVideoDao.value.deleteAll()
     }
 
-    suspend fun fetchYoutubeVideos(location: Location, page: Int): Boolean {
-        return runCatching {
-            withContext(Dispatchers.IO) {
-                val documentReference = firestoreDB.value
-                    .collection(location.channelId)
-                    .document("$page")
-                val source = if (hasYoutubeVideoDataExpired(location.channelId, page)) Source.SERVER
-                else Source.CACHE
+    suspend fun fetchYoutubeVideos(location: Location, page: Int): Boolean =
+        runCatching {
+            firebaseUserAuth {
+                withContext(Dispatchers.IO) {
+                    val documentReference = firestoreDB.value
+                        .collection(location.channelId)
+                        .document("$page")
+                    val source =
+                        if (hasYoutubeVideoDataExpired(location.channelId, page)) Source.SERVER
+                        else Source.CACHE
 
-                await(documentReference.get(source)).run {
-                    if (!exists() && metadata.isFromCache) {
-                        await(documentReference.get(Source.SERVER))
-                    } else this
-                }.apply {
-                    if (exists() && !metadata.isFromCache) {
-                        sharedPreferences.setDataTimeStamp(location.channelId, page)
+                    await(documentReference.get(source)).run {
+                        if (!exists() && metadata.isFromCache) {
+                            await(documentReference.get(Source.SERVER))
+                        } else this
+                    }.apply {
+                        if (exists() && !metadata.isFromCache) {
+                            sharedPreferences.setDataTimeStamp(location.channelId, page)
+                        }
+                    }.toYoutubeVideoList().apply {
+                        youtubeVideoDao.value.insert(this)
                     }
-                }.toYoutubeVideoList().apply {
-                    youtubeVideoDao.value.insert(this)
                 }
             }
         }.onFailure {
             Log.d("Fetch Error", "Youtube videos fetching error: $it")
         }.isSuccess
-    }
 
     suspend fun fetchPodcastPlayList(playlist: String): List<MediaItem>? =
         runCatching {
-            withContext(Dispatchers.IO) {
-                val documentReference = firestoreDB.value
-                    .collection(PODCAST_COLLECTION_KEY)
-                    .document(playlist)
-                val source = if (hasPodcastPlaylistDataExpired(playlist)) Source.SERVER
-                else Source.CACHE
+            firebaseUserAuth {
+                withContext(Dispatchers.IO) {
+                    val documentReference = firestoreDB.value
+                        .collection(PODCAST_COLLECTION_KEY)
+                        .document(playlist)
+                    val source = if (hasPodcastPlaylistDataExpired(playlist)) Source.SERVER
+                    else Source.CACHE
 
-                await(documentReference.get(source)).run {
-                    if (!exists() && metadata.isFromCache) {
-                        await(documentReference.get(Source.SERVER))
-                    } else this
-                }.apply {
-                    if (exists() && !metadata.isFromCache) {
-                        sharedPreferences.setDataTimeStamp(playlist)
-                    }
-                }.toMediaItemList()
+                    await(documentReference.get(source)).run {
+                        if (!exists() && metadata.isFromCache) {
+                            await(documentReference.get(Source.SERVER))
+                        } else this
+                    }.apply {
+                        if (exists() && !metadata.isFromCache) {
+                            sharedPreferences.setDataTimeStamp(playlist)
+                        }
+                    }.toMediaItemList()
+                }
             }
         }.onFailure {
             Log.d("Fetch Error", "Playlist fetching error: $it")
@@ -107,5 +114,14 @@ class MediaRepository(context: Context) {
 
     private fun hasDataExpired(timeStamp: Long): Boolean =
         (Date().time - timeStamp) > EXPIRATION_TIME
+
+    private suspend fun <T> firebaseUserAuth(invoke: suspend (FirebaseUser?) -> T)
+    : T = withContext(Dispatchers.IO) {
+        Firebase.auth.run {
+            if (currentUser == null) {
+                invoke(await(signInAnonymously()).user)
+            } else invoke(currentUser)
+        }
+    }
 
 }

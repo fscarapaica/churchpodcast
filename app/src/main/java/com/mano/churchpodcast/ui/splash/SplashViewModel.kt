@@ -13,6 +13,8 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.mano.churchpodcast.BuildConfig
 import com.mano.churchpodcast.R
+import com.mano.churchpodcast.db.MediaRepository
+import kotlinx.coroutines.launch
 
 class SplashViewModel(application: Application): AndroidViewModel(application) {
 
@@ -32,12 +34,14 @@ class SplashViewModel(application: Application): AndroidViewModel(application) {
     private val _isHandlerFinished = MutableLiveData<Boolean>()
     private val _isSignInAnonymously = MutableLiveData<Boolean>()
     private val _isGooglePlayServiceUpdated = MutableLiveData<Boolean>()
+    private val _isRepositoryInitialized = MutableLiveData<Boolean>()
 
     val launchMainActivity: LiveData<Boolean> = launchMainActivity(
         _isSignInAnonymously,
         _isRemoteConfigLoaded,
         _isGooglePlayServiceUpdated,
-        _isHandlerFinished
+        _isHandlerFinished,
+        _isRepositoryInitialized
     )
     val isGooglePlayServiceUpdated: LiveData<Boolean>
         get() = _isGooglePlayServiceUpdated
@@ -47,6 +51,10 @@ class SplashViewModel(application: Application): AndroidViewModel(application) {
         firebaseRemoteConfigSetup()
         googlePlayServicesSetup(application)
         handlerSetup()
+        viewModelScope.launch {
+            MediaRepository(application).init()
+            _isRepositoryInitialized.value = true
+        }
     }
 
     fun googlePlayServiceUpdate() {
@@ -63,7 +71,9 @@ class SplashViewModel(application: Application): AndroidViewModel(application) {
         Firebase.remoteConfig.apply {
             setDefaultsAsync(R.xml.remote_config_defaults)
             setConfigSettingsAsync(remoteConfig)
-            fetchAndActivate().addOnCompleteListener {
+            fetch().onSuccessTask {
+                activate()
+            }.addOnCompleteListener {
                 _isRemoteConfigLoaded.value = true
             }
         }
