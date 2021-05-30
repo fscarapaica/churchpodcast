@@ -16,3 +16,4 @@ Application features:
   * Access to firestore database.
 
 Firebase project:
+https://github.com/fscarapaica/churchpodcast-firebase
