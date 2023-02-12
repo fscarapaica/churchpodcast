@@ -1,19 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
-    ext {
-        kotlin_version = '1.5.10'
-        room_version = '2.3.0'
-        nav_version = "2.3.1"
-    }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.gms:google-services:4.3.8'
-        classpath 'com.android.tools.build:gradle:4.2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath(Build.androidBuildToolsPlugin)
+        classpath(Build.googleServicesGradlePlugin)
+        classpath(Build.kotlinGradlePlugin)
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -26,6 +20,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register("clean", Delete::class) {
+    delete(rootProject.buildDir)
 }

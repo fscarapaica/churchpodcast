@@ -40,18 +40,16 @@ internal open class OnSwipeTouchListener(c: Context,val view: View) : View.OnTou
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
+            e1: MotionEvent,
+            e2: MotionEvent,
             distanceX: Float,
             distanceY: Float
         ): Boolean {
-            if (e1 != null && e2 != null) {
-                val diffX = e2.x - e1.x
-                val relativePosition = view.translationX + diffX
-                if (relativePosition > 0) {
-                    view.translationX = relativePosition
-                } else view.translationX = 0f
-            }
+            val diffX = e2.x - e1.x
+            val relativePosition = view.translationX + diffX
+            if (relativePosition > 0) {
+                view.translationX = relativePosition
+            } else view.translationX = 0f
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
     }
