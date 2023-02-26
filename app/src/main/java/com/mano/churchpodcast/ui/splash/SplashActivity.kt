@@ -55,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             connectionStatusCode,
             REQUEST_GOOGLE_PLAY_SERVICES
         )
-        dialog.show()
+        dialog?.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
