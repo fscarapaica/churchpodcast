@@ -16,17 +16,17 @@ import com.mano.churchpodcast.R
 import com.mano.churchpodcast.db.MediaRepository
 import kotlinx.coroutines.launch
 
-class SplashViewModel(application: Application): AndroidViewModel(application) {
+class RouterViewModel(application: Application): AndroidViewModel(application) {
 
     companion object {
-        private const val SPLASH_TIME_MS = 700L
+        private const val ROUTER_MIN_LOAD_TIME_MS = 700L
     }
 
     private val remoteConfig = remoteConfigSettings {
         minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) {
             30
         } else {
-            1 * 60 * 60
+            1 * 60 * 60 // 2 hours refresh time for production
         }
     }
 
@@ -64,7 +64,7 @@ class SplashViewModel(application: Application): AndroidViewModel(application) {
     private fun handlerSetup() {
         Handler(Looper.getMainLooper()).postDelayed({
             _isHandlerFinished.value = true
-        }, SPLASH_TIME_MS)
+        }, ROUTER_MIN_LOAD_TIME_MS)
     }
 
     private fun firebaseRemoteConfigSetup() {
