@@ -1,4 +1,4 @@
-apply(from = "$rootDir/compose-lib-module.gradle")
+apply(from = "$rootDir/base-compose-module.gradle")
 
 plugins {
     id("com.android.library")
@@ -10,8 +10,7 @@ android {
 
 dependencies {
     implementation(project(Modules.core))
+    implementation(project(Modules.core_compose))
 
     implementation(AndroidX.coreKtx)
-    implementation(AndroidX.appCompat)
-    implementation(Google.material)
 }
