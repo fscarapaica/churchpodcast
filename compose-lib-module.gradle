@@ -1,0 +1,17 @@
+apply from: "$rootDir/base-lib-module.gradle"
+apply plugin: 'com.android.library'
+
+android {
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.2"
+    }
+}
+
+dependencies {
+    // Compose dependencies
+
+}

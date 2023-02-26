@@ -42,6 +42,10 @@ android {
 
 dependencies {
     implementation(project(Modules.player))
+    implementation(project(Modules.core))
+    implementation(project(Modules.onboarding_domain))
+    implementation(project(Modules.onboarding_presentation))
+
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(files("libs/${Player.youtubePlayerLib}"))
 
