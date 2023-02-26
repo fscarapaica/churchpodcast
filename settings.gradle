@@ -8,6 +8,7 @@ dependencyResolutionManagement {
 
 rootProject.name='Chruch Podcast'
 include ':app', ':player_old'
+include ':core_compose'
 include ':core'
 include ':onboarding'
 include ':onboarding:onboarding_presentation'

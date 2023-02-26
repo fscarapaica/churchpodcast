@@ -1,4 +1,4 @@
-apply(from = "$rootDir/base-lib-module.gradle")
+apply(from = "$rootDir/base-module.gradle")
 
 plugins {
     id("com.android.library")

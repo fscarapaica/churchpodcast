@@ -1,0 +1,36 @@
+apply from: "$rootDir/base-module.gradle"
+apply plugin: 'com.android.library'
+
+android {
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.2"
+    }
+}
+
+dependencies {
+    def composeBom = platform(Compose.composeBOM)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    // Compose dependencies
+    implementation(Compose.composeMaterial3)
+
+    // Android Studio Preview support
+    implementation(Compose.composeToolingPreview)
+    debugImplementation(Compose.composeTooling)
+
+    // UI Tests
+    androidTestImplementation(Compose.composeTestJunit4)
+    debugImplementation(Compose.composeTestManifest)
+
+    // Optional - Integration with activities
+    implementation(Compose.composeActivity)
+    // Optional - Integration with ViewModels
+    implementation(Compose.composeLifecycleViewModel)
+    // Optional - Integration with LiveData
+    implementation(Compose.composeLiveData)
+}

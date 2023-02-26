@@ -1,4 +1,4 @@
-apply(from = "$rootDir/base-lib-module.gradle")
+apply(from = "$rootDir/base-module.gradle")
 
 plugins {
     id("com.android.library")
@@ -11,7 +11,4 @@ android {
 dependencies {
     implementation(project(Modules.core))
 
-    implementation(AndroidX.coreKtx)
-    implementation(AndroidX.appCompat)
-    implementation(Google.material)
 }

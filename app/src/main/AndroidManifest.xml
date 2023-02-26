@@ -20,6 +20,13 @@
             android:name=".ui.splash.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
+
+        </activity>
+
+        <activity
+            android:name=".ui.compose.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
