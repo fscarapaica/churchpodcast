@@ -30,6 +30,9 @@ object AndroidX {
     private const val swipeRefreshLayoutVersion = "1.1.0"
     const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion"
 
+    private const val splashSreenVersion = "1.0.0"
+    const val splashSreen = "androidx.core:core-splashscreen:1.0.0$splashSreenVersion"
+
     // TODO: CHECK IF DEPENDENCY STILL NEEDED
     private const val legacySupportVersion = "1.0.0"
     const val legacySupport = "androidx.legacy:legacy-support-v4:$legacySupportVersion"

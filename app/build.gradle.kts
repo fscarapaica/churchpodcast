@@ -62,6 +62,7 @@ dependencies {
 
     implementation(AndroidX.appCompat)
     implementation(AndroidX.coreKtx)
+    implementation(AndroidX.splashSreen)
 
     implementation(Coroutines.core)
 
