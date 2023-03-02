@@ -20,13 +20,6 @@
             android:name=".ui.splash.RouterActivity"
             android:theme="@style/Theme.App.Starting"
             android:exported="true">
-
-        </activity>
-
-        <activity
-            android:name=".ui.compose.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,6 +27,12 @@
 
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.compose.MainComposeActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
         </activity>
 
         <activity

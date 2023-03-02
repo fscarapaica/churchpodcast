@@ -16,6 +16,9 @@ object Compose {
 
     const val composeLiveData = "androidx.compose.runtime:runtime-livedata"
 
+    private const val composeNavigationVersion = "2.5.3"
+    const val composeNavigation = "androidx.navigation:navigation-compose:$composeNavigationVersion"
+
     private const val composeActivityVersion = "1.6.1"
     const val composeActivity = "androidx.activity:activity-compose:$composeActivityVersion"
 
