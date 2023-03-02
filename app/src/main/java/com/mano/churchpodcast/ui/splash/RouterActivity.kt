@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.gms.common.GoogleApiAvailability
 import com.mano.churchpodcast.ui.MainActivity
+import com.mano.churchpodcast.ui.compose.MainComposeActivity
 
 class RouterActivity : AppCompatActivity() {
 
@@ -38,7 +39,7 @@ class RouterActivity : AppCompatActivity() {
     }
 
     private fun gotoMainActivity() {
-        Intent(applicationContext, MainActivity::class.java).run {
+        Intent(applicationContext, MainComposeActivity::class.java).run {
             startActivity(this)
         }
         finish()

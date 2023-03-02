@@ -122,8 +122,25 @@ dependencies {
     implementation(Compose.composeLifecycleViewModel)
     // Optional - Integration with LiveData
     implementation(Compose.composeLiveData)
+    // Optional - Integration with NavigationController
+    implementation(Compose.composeNavigation)
+
+    implementation("com.google.dagger:hilt-android:2.45")
+    kapt("com.google.dagger:hilt-compiler:2.45")
+
+    // For instrumentation tests
+    androidTestImplementation ("com.google.dagger:hilt-android-testing:2.45")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:2.45")
+
+    // For local unit tests
+    testImplementation("com.google.dagger:hilt-android-testing:2.45")
+    kaptTest("com.google.dagger:hilt-compiler:2.45")
 
     testImplementation(Test.junit)
     androidTestImplementation(Test.junitAndroid)
     androidTestImplementation(Test.junitAndroidEspresso)
+}
+
+kapt {
+    correctErrorTypes = true
 }

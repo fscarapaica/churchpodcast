@@ -33,4 +33,6 @@ dependencies {
     implementation(Compose.composeLifecycleViewModel)
     // Optional - Integration with LiveData
     implementation(Compose.composeLiveData)
+    // Optional - Integration with NavigationController
+    implementation(Compose.composeNavigation)
 }
