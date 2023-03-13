@@ -29,7 +29,9 @@ import com.mano.churchpodcast.ext.isScrollEnable
 import com.mano.churchpodcast.ext.navigateExoPlayer
 import com.mano.churchpodcast.ui.adapter.LocationAdapter
 import com.mano.churchpodcast.ui.dialog.LocationPopup
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val activityViewModel: MainActivityViewModel by viewModels()
